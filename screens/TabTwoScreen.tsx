@@ -1,14 +1,44 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '../components/EditScreenInfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
+import { Button, StyleSheet } from 'react-native';
 import { Text, View } from '../components/Themed';
 
 export default function TabTwoScreen() {
+
+  const [name, setName] = useState("")
+  const [surname, setSurname] = useState("")
+
+
+  const retrieveData = async () => {
+    try {
+      const name = await AsyncStorage.getItem('@name');
+      if (name !== null) {
+        setName(name)
+      }
+      
+      const surname = await AsyncStorage.getItem('@surname');
+      if (surname !== null) {
+        setSurname(surname)
+      }
+    } catch (error) {
+      // Error retrieving data
+    }
+  };
+
+  useEffect(() => {
+    retrieveData()
+  }, [])
+  
+  
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
+      <Text style={styles.title}>Hello, {surname + " " + name}</Text>
+      <Button
+          title={"Refresh data"}
+          onPress={() => {
+            retrieveData();
+          }}
+        />
     </View>
   );
 }
